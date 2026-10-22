@@ -41,7 +41,12 @@ async function open($: EngineInterface, touch: Touch, socket: string | undefined
   const path = absolute(touch.path, await $.session.cwd())
   const line = await lineFor($, { ...touch, path })
   const run = await $.process.run(openArgv(server, path, line), { timeoutMs: 5000 })
-  if (run.exitCode !== 0) return `Neovim at ${server} refused: ${(run.stderr || run.stdout).trim()}`
+  if (run.exitCode !== 0) {
+    const why = (run.stderr || run.stdout).trim()
+    return why.includes('E247')
+      ? `No Neovim is listening at ${server}. Start one with \`nvim --listen ${server}\`.`
+      : `Neovim at ${server} refused: ${why}`
+  }
 
   return `Opened ${path}:${line} in Neovim.`
 }

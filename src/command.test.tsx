@@ -6,7 +6,7 @@ const start = { cwd: '/w', surface: 'terminal', isInteractive: true } as const
 const nv = (args: string) =>
   ({ command: 'nv', args, origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 80 } }) as const
 
-function engine(on: On, runs: string[][]) {
+function engine(on: On, runs: string[][], stderr = '') {
   on('command.register', () => ({ value: { command: 'nv' } }))
   on('session.start', (_, e) => ({ cwd: e.cwd }))
   on('session.cwd', () => ({ value: '/w' }))
@@ -14,7 +14,7 @@ function engine(on: On, runs: string[][]) {
   on('fs.read', () => ({ value: 'one\ntwo\nNEW\n' }))
   on('process.run', (_, e) => {
     runs.push([...e.argv])
-    return { value: { exitCode: 0, stdout: '', stderr: '', isStdoutTruncated: false, isStderrTruncated: false } }
+    return { value: { exitCode: stderr ? 1 : 0, stdout: '', stderr, isStdoutTruncated: false, isStderrTruncated: false } }
   })
 }
 
@@ -95,4 +95,13 @@ test('no button while running, or on other tools', async ($, on) => {
     expect(await ui.find({ type: 'Button', key: 'nvim' })).toBe(undefined)
     await ui.unmount()
   }
+})
+
+test('a Neovim that is gone gets a plain hint', { options: { socket: '/tmp/s' } }, async ($, on) => {
+  engine(on, [], "E247: Failed to connect to '/tmp/s': connection refused.")
+  mock.env(on, {})
+  await $.session.start(start)
+  await $.tool.call({ tool: 'Write', file_path: '/w/y.ts', content: 'z' })
+
+  expect((await $.command.run(nv(''))).text).toBe('No Neovim is listening at /tmp/s. Start one with `nvim --listen /tmp/s`.')
 })
