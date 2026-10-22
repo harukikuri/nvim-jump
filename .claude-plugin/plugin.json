@@ -1,0 +1,16 @@
+{
+  "name": "nvim-jump",
+  "version": "0.1.0",
+  "description": "Open the file Claude last touched in your running Neovim, at the line it touched",
+  "license": "MIT",
+  "author": { "name": "harukikuri" },
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "socket": {
+      "type": "string",
+      "title": "Neovim socket",
+      "description": "Path Neovim listens on (nvim --listen <path>). Used when $NVIM is not set.",
+      "default": ""
+    }
+  }
+}
