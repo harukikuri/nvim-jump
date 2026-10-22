@@ -1,0 +1,13 @@
+{
+  "name": "nvim-jump",
+  "description": "Jump from Claude Code to your running Neovim",
+  "owner": {
+    "name": "harukikuri"
+  },
+  "plugins": [
+    {
+      "name": "nvim-jump",
+      "source": "./"
+    }
+  ]
+}

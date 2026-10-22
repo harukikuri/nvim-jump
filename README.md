@@ -2,6 +2,16 @@
 
 A Claude Code mod: `/nv` opens the file Claude last touched (Edit, Write, Read) in your running Neovim, at the line it touched.
 
+## Install
+
+```
+/plugin install nvim-jump --marketplace harukikuri/nvim-jump
+```
+
+Answer `y` to add the marketplace, then pick a scope. Needs Claude Code 2.1.287 or later and Neovim (tested on 0.12.1; 0.9 or later should work).
+
+## Use
+
 - `/nv` — the most recent file
 - `/nv 2` — the one before, and so on (up to 50 per session)
 - the `nvim` button after each Read / Edit / Write row in the transcript
@@ -27,4 +37,4 @@ Reads files (`$.fs.read`) and runs `nvim` only (no shell). No network.
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE).
