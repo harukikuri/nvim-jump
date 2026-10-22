@@ -6,7 +6,7 @@ import { absolute, lineOf } from '../src/line'
 import { findServer, openArgv } from '../src/nvim'
 
 const SETUP =
-  'nvim-jump: no Neovim found. Run Claude Code inside :terminal, or start `nvim --listen <path>` and set that path in /config.'
+  'No Neovim found. Run Claude Code inside :terminal, or start `nvim --listen <path>` and set that path in /config.'
 
 async function lineFor($: EngineInterface, touch: Touch) {
   if (touch.tool !== 'Edit' || touch.newString === undefined) return touch.line ?? 1
@@ -45,14 +45,14 @@ export const register: Register = (on, options) => {
     if (!Number.isInteger(n) || n < 1) return { text: 'Usage: /nv [n]' }
 
     const touch = await nthBack($, n)
-    if (!touch) return { text: `nvim-jump: nothing touched ${n > 1 ? `${n} back ` : ''}yet.` }
+    if (!touch) return { text: `Nothing touched ${n > 1 ? `${n} back ` : ''}yet.` }
 
     const server = findServer(
       await $.env.get('NVIM'),
       typeof options.socket === 'string' ? options.socket : undefined,
     )
     if (!server) {
-      $.ui.toast(SETUP)
+      $.ui.toast(`nvim-jump: ${SETUP}`)
       return { text: SETUP }
     }
 
@@ -60,7 +60,7 @@ export const register: Register = (on, options) => {
     const line = await lineFor($, { ...touch, path })
     const run = await $.process.run(openArgv(server, path, line), { timeoutMs: 5000 })
     if (run.exitCode !== 0) {
-      return { text: `nvim-jump: Neovim at ${server} refused: ${(run.stderr || run.stdout).trim()}` }
+      return { text: `Neovim at ${server} refused: ${(run.stderr || run.stdout).trim()}` }
     }
 
     return { text: `Opened ${path}:${line} in Neovim.` }

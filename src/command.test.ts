@@ -29,7 +29,7 @@ test('/nv opens the newest touch at its line through $NVIM', async ($, on) => {
 
   expect((await $.command.run(nv(''))).text).toBe('Opened /w/src/a.ts:12 in Neovim.')
   expect((await $.command.run(nv('2'))).text).toBe('Opened /w/x.ts:3 in Neovim.')
-  expect((await $.command.run(nv('3'))).text).toContain('nothing touched 3 back')
+  expect((await $.command.run(nv('3'))).text).toBe('Nothing touched 3 back yet.')
   expect(runs[1]?.slice(0, 3)).toEqual(['nvim', '--server', '/run/nvim.1'])
 })
 
@@ -51,6 +51,6 @@ test('/nv with no Neovim says how to set one up and runs nothing', async ($, on)
   await $.session.start(start)
   await $.tool.call({ tool: 'Read', file_path: '/w/y.ts' })
 
-  expect((await $.command.run(nv(''))).text).toContain('no Neovim found')
+  expect((await $.command.run(nv(''))).text).toContain('No Neovim found')
   expect(runs.length).toBe(0)
 })
