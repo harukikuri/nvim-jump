@@ -4,6 +4,7 @@ A Claude Code mod: `/nv` opens the file Claude last touched (Edit, Write, Read) 
 
 - `/nv` — the most recent file
 - `/nv 2` — the one before, and so on (up to 50 per session)
+- the `nvim` button after each Read / Edit / Write row in the transcript
 
 ## Which line
 

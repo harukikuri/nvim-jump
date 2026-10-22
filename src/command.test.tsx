@@ -54,3 +54,45 @@ test('/nv with no Neovim says how to set one up and runs nothing', async ($, on)
   expect((await $.command.run(nv(''))).text).toContain('No Neovim found')
   expect(runs.length).toBe(0)
 })
+
+const row = (tool: string, input: unknown, isRunning = false) =>
+  ({
+    plugin: 'nvim-jump',
+    component: 'ToolUse',
+    requestId: 't1',
+    props: { tool_use_id: 't1', tool, input, isRunning, isErrored: false, isInterrupted: false },
+  }) as const
+
+test('a finished Edit row gets an nvim button that opens its line, on every surface', async ($, on) => {
+  const runs: string[][] = []
+  engine(on, runs)
+  mock.env(on, { NVIM: '/run/nvim.1' })
+  on('ui.render', (_, e) => {
+    const { Text } = _.ui.resolve(e)
+    return <Text>engine row</Text>
+  })
+  await $.session.start(start)
+
+  for (const surface of ['terminal', 'desktop'] as const) {
+    const ui = await $.ui.mount({ ...row('Edit', { file_path: '/w/x.ts', new_string: 'NEW' }), surface })
+    expect((await ui.find({ type: 'Text', text: /engine row/ }))?.text).toBe('engine row')
+    await ui.press({ key: 'nvim' })
+    expect(runs.at(-1)?.[4]).toContain("['/w/x.ts', 3]")
+    await ui.unmount()
+  }
+})
+
+test('no button while running, or on other tools', async ($, on) => {
+  engine(on, [])
+  on('ui.render', (_, e) => {
+    const { Text } = _.ui.resolve(e)
+    return <Text>engine row</Text>
+  })
+  await $.session.start(start)
+
+  for (const props of [row('Read', { file_path: '/w/x.ts' }, true), row('Bash', { command: 'ls' })]) {
+    const ui = await $.ui.mount({ ...props, surface: 'terminal' })
+    expect(await ui.find({ type: 'Button', key: 'nvim' })).toBe(undefined)
+    await ui.unmount()
+  }
+})
